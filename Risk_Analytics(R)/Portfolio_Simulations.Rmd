@@ -1,0 +1,111 @@
+---
+title: "Portfolio Simulations"
+author: "Bryan Bruno"
+date: "09-28-2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Hedge funds can earn high proﬁts through the use of leverage, but leverage also creates high risk. The simulations in this section explore the eﬀects of leverage in a simpliﬁed setting.
+
+Suppose a hedge fund owns $1,000,000 of stock and used $50,000 of its own capital and $950,000 in borrowed money for the purchase. Suppose that if the value of the stock falls below $950,000 at the end of any trading day, then the hedge fund will sell all the stock and repay the loan. This will wipe out its $50,000 investment. The hedge fund is said to be leveraged 20:1 since its position is 20 times the amount of its own capital invested. Suppose that the daily log returns on the stock have a mean of 0.05/year and a standard deviation of 0.23/year. These can be converted to rates per trading day by dividing by 253 and √253, respectively.
+
+**What is the probability that the value of the stock will be below $950,000 at the close of at least one of the next 45 trading days?**
+
+
+```{r problem 4}
+niter = 1e5 # number of iterations
+below = rep(0, niter) # set up storage
+
+set.seed(2009)
+
+for (i in 1:niter){
+  r = rnorm(45, mean = 0.05/253, sd = 0.23/sqrt(253)) # generate random numbers
+  logPrice = log(1e6) + cumsum(r)
+  minlogP = min(logPrice) # minimum price over next 45 days
+  below[i] = as.numeric(minlogP < log(950000))
+  }
+mean(below)
+```
+
+Suppose the hedge fund will sell the stock for a proﬁt of at least $100,000 if the value of the stock rises to at least $1,100,000 at the end of one of the ﬁrst 100 trading days, sell it for a loss if the value falls below $950,000 at the end of one of the ﬁrst 100 trading days, or sell after 100 trading days if the closing price has stayed between $950,000 and $1,100,000.
+
+**What is the probability that the hedge fund will make a proﬁt of at least $100,000?**
+
+**What is the probability the hedge fund will suﬀer a loss?**
+
+**What is the expected proﬁt from this trading strategy?**
+
+```{r problem 5, 6, 7}
+# iterations
+niter = 1e5 
+sim_days = 100
+
+# storage variables
+below = rep(0, niter) 
+above = rep(0, niter) 
+middle = rep(0, niter)
+profit = rep(0, niter)
+
+# thresholds
+prof_thresh = 1e6 + 1e5
+log_prof_thresh = log(prof_thresh)
+loss_thresh = 1e6 - 5e4
+log_loss_thresh = log(loss_thresh)
+
+set.seed(2009)
+
+for (i in 1:niter){
+  r = rnorm(sim_days, mean = 0.05/253, sd = 0.23/sqrt(253)) 
+  logPrice = log(1e6) + cumsum(r)
+
+  minlogP = min(logPrice)
+  maxlogP = max(logPrice)
+  
+  p_thresh_hit = maxlogP >= log_prof_thresh
+  l_thresh_hit = minlogP <= log_loss_thresh
+  
+  if(p_thresh_hit & !l_thresh_hit){
+    above[i] = 1
+    profit[i] = +1e5
+  }
+
+  if(!p_thresh_hit & l_thresh_hit){
+    below[i] = 1
+    profit[i] = -5e4
+  }
+    
+  if(p_thresh_hit & l_thresh_hit){
+    days_max = which(logPrice >= log_prof_thresh)[1]
+    days_min = which(logPrice <= log_loss_thresh)[1]
+    
+    if(days_min < days_max){
+      below[i] = 1
+      profit[i] = -5e4
+    }
+    
+    else{
+      above[i] = 1
+      profit[i] = +1e5
+    }
+  }
+
+  if(!p_thresh_hit & !l_thresh_hit){
+    middle[i] = 1
+    profit[i] = exp(logPrice[sim_days]) - 1e6
+  }
+}
+print("Solutions:")
+print(round(mean(above)*100, 3))
+print(round(mean(below)*100, 3))
+print(round(mean(profit), 2))
+```
+
+**There is a 38.78% probability that the hedge fund will make a profit of at least $100,000.**
+
+**There is a 58.84% probability that the hedge fund will suffer a loss.**
+
+**The expected profit from this trading strategy is $9922.63.**
