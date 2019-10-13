@@ -1,0 +1,87 @@
+---
+title: "Fitting Bivariate T-Distributions"
+author: "Bryan Bruno"
+date: "10-8-2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Setup Code
+
+```{r code}
+library(mnormt)
+
+data(CRSPday, package = "Ecdat")
+
+Y = CRSPday[ , c(5, 7)]
+
+loglik = function(par){
+  mu = par[1:2]
+  A = matrix(c(par[3], par[4], 0, par[5]), nrow = 2, byrow = T)
+  scale_matrix = t(A) %*% A
+  df = par[6]
+  -sum(log(dmt(Y, mean = mu, S = scale_matrix, df = df)))
+}
+
+A = chol(cov(Y))
+start = as.vector(c(apply(Y, 2, mean), A[1, 1], A[1, 2], A[2, 2], 4))
+fit_mvt = optim(start, loglik, method = "L-BFGS-B",
+                lower = c(-0.02, -0.02, -0.1, -0.1, -0.1, 2),
+                upper = c(0.02, 0.02, 0.1, 0.1, 0.1, 15), hessian = T)
+```
+
+### Part A
+What does the code A = chol(cov(Y)) do?
+
+```{r code_look}
+head(Y)
+print(cov(Y))
+print(A)
+```
+**To put this equation into plain English, A is equal to the Cholesky factorization of the covariance matrix of Y. In this case, Y contains the stock returns of both IBM and CRSP. In the code above, I have outlined the head of Y, which displays the first six returns of IBM and CRSP. Next, I show the covariance 2 by 2 matrix of Y. Finally, I output the resulting Cholesky factorization of the matrix, A.**
+
+### Part B
+Find the MLE of θ.
+
+```{r part_b}
+fit_mvt$par
+```
+
+### Part C
+Find the Fisher information matrix for θ.
+
+```{r part_c}
+fit_mvt$hessian
+fisherinv = solve(fit_mvt$hessian, diag(length(fit_mvt$par)))
+fisherinv
+```
+
+### Part D
+Find the standard errors of the components of the MLE of θ using the Fisher information matrix.
+
+```{r part_d}
+sqrt(diag(fisherinv))
+```
+
+### Part E
+Find the MLE of the covariance matrix of the returns.
+
+```{r part_e}
+parfit = fit_mvt$par
+R = matrix(c(parfit[3], parfit[4], 0, parfit[5]), nrow = 2, byrow = T)
+covmat = t(R) %*% R
+covmat
+```
+
+### Part F
+Find the MLE of ρ, the correlation between the two returns (Y1 and Y2).
+
+```{r part_f}
+YD = diag(c(sqrt(covmat[1, 1]), sqrt(covmat[2, 2])))
+invYD = solve(YD, diag(2))
+cormat = invYD %*% (covmat %*% invYD)
+cormat
+```
