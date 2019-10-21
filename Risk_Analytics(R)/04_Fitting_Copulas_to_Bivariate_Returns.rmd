@@ -1,0 +1,116 @@
+---
+title: 'Fitting Copulas to Bivariate Return Data'
+author: "Bryan Bruno"
+date: "10-18-2019"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Setup Code
+
+```{r code}
+library(MASS) # for fitdistr() and kde2d() functions
+library(copula) # for copula functions
+library(fGarch) # for standardized t density
+netRtns = read.csv("IBM_SP500_04_14_daily_netRtns.csv", header = T)
+ibm = netRtns[,2]
+sp500 = netRtns[,3]
+est.ibm = as.numeric( fitdistr(ibm,"t")$estimate )
+est.sp500 = as.numeric( fitdistr(sp500,"t")$estimate )
+est.ibm[2] = est.ibm[2] * sqrt( est.ibm[3] / (est.ibm[3]-2) )
+est.sp500[2] = est.sp500[2] * sqrt(est.sp500[3] / (est.sp500[3]-2) )
+```
+
+### Part 1
+
+Find the equation and compute the value for omega.
+
+**To find omega, we need use Kendall's tau correlation. From the text we have sin((Kendall's tau correlation)*(pi/2)). This is performed below to solve for omega.** 
+
+```{r omega}
+cor_tau = cor(ibm, sp500, method = "kendall")
+omega = sin(cor_tau*(pi/2)) 
+omega
+```
+
+Next, deﬁne the t-copula using omega as the correlation parameter and 4 as the degrees-of-freedom (tail index) parameter.
+
+```{r t-copula}
+cop_t_dim2 = tCopula(omega, dim = 2, dispstr = "un", df = 4)
+
+data1 = cbind(pstd(ibm, est.ibm[1], est.ibm[2], est.ibm[3]),
+              pstd(sp500, est.sp500[1], est.sp500[2], est.sp500[3]))
+n = nrow(netRtns) ; n
+data2 = cbind(rank(ibm)/(n+1), rank(sp500)/(n+1))
+ft1 = fitCopula(cop_t_dim2, data1, method="ml", start=c(omega,4) )
+ft2 = fitCopula(cop_t_dim2, data2, method="ml", start=c(omega,4) )
+```
+
+### Part 2a 
+
+Explain the diﬀerence between methods used to obtain the two estimates ft1 and ft2. 
+
+**Both methods are estimated differently through their t-distributions. ft1 estimates using a parametric method while ft2 uses the non-parametric empirical CDF.**
+
+### Part 2b 
+
+```{r 5}
+ft1
+ft2
+```
+
+Do the two estimates seem signiﬁcantly diﬀerent (in a practical sense)?
+
+**The two estimations for the correlation are ft1 = 0.7022 and ft2 = 0.7032. Additionally, the degrees of freedom are ft1 = 2.9844 and ft2 = 3.0219. Both of these estimates are extremely close and have no significant differences for practical use.**
+
+### Part 3
+
+```{r 6a}
+mvdc_t_t = mvdc(cop_t_dim2, c("std","std"), list(
+  list(mean=est.ibm[1],sd=est.ibm[2],nu=est.ibm[3]),
+  list(mean=est.sp500[1],sd=est.sp500[2],nu=est.sp500[3])))
+
+start = c(est.ibm, est.sp500, ft1@estimate)
+objFn = function(param) -loglikMvdc(param,cbind(ibm,sp500),mvdc_t_t)
+tic = proc.time()
+ft = optim(start, objFn, method="L-BFGS-B",
+           lower = c(-.1,0.001,2.2, -0.1,0.001,2.2, 0.2,2.5),
+           upper = c( .1, 10, 15, 0.1, 10, 15, 0.9, 15))
+toc = proc.time()
+total_time = toc - tic ; total_time[3]/60
+```
+
+### Part 6a & 6b
+
+What are the estimates of the copula parameters in ft? What are the estimates of the parameters in the univariate marginal distributions?
+
+```{r 6ab}
+ft
+```
+
+**First three parameters are IBM and the next three are SP500. The final two are the rho and df of the copula which are used below.**
+
+### Part 6c
+
+Was the estimation method maximum likelihood, semiparametric pseudomaximum likelihood, or parametric pseudo-maximum likelihood? 
+
+**Since these are being estimated over the parameters of the marginal distributions along with the parameters of the t-distribution copula, this is the maximum likelihood estimation method.**
+
+### Part 6d
+
+Estimate the coefficient of lower tail dependence for this copula.
+
+```{r 6d}
+
+ft_rho = ft$par[7] # setting rho
+ft_df = ft$par[8] # setting df
+
+x = -sqrt(((ft_df + 1)*(1 - ft_rho))/(1 + ft_rho))
+lambdax = 2*pt(x, 1 + ft_df)
+lambdax
+```
