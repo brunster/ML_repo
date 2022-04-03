@@ -116,9 +116,9 @@ y_pred = model.predict(future)
 #forecast and weights available to view
 st.subheader("Closing Forecast")
 st.markdown("""
-* Black Dots: actual positions
-* Dark Blue Line: Forecast
-* Light Blue: Upper and Lower Variance
+* **Black Dots**: actual positions
+* **Dark Blue Line**: Forecast
+* **Light Blue**: Upper and Lower Variance
 """)
 
 fig = plot_plotly(model, y_pred)
