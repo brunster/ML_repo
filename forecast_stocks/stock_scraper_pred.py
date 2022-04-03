@@ -115,6 +115,12 @@ y_pred = model.predict(future)
 #providing the final 60 day
 #forecast and weights available to view
 st.subheader("Closing Forecast")
+st.markdown("""
+* Black Dots: actual positions
+* Dark Blue Line: Forecast
+* Light Blue: Upper and Lower Variance
+""")
+
 fig = plot_plotly(model, y_pred)
 st.plotly_chart(fig)
 st.subheader("Last 60 Day Forecast")
