@@ -116,7 +116,7 @@ y_pred = model.predict(future)
 #forecast and weights available to view
 st.subheader("Closing Forecast")
 st.markdown("""
-* **Black Dots**: actual positions
+* **Black Dots**: Actual Positions
 * **Dark Blue Line**: Forecast
 * **Light Blue**: Upper and Lower Variance
 """)
