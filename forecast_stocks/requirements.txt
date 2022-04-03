@@ -1,6 +1,9 @@
 ### Requirements ###
-streamlit
-yfinance
+Cython
+numpy
+pandas
 pystan==2.19.1.1
-prophet
+yfinance
+streamlit
 plotly
+fbprophet
