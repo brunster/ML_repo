@@ -120,7 +120,6 @@ st.markdown("""
 * **Dark Blue Line**: Forecast
 * **Light Blue**: Upper and Lower Variance
 """)
-
 fig = plot_plotly(model, y_pred)
 st.plotly_chart(fig)
 st.subheader("Last 60 Day Forecast")
