@@ -89,7 +89,7 @@ st.markdown("""
 """)
 
 #user may select the number of years they'd like to forecast
-st.subheader("Choose Number of Years to Predict")
+st.subheader("Choose Number of Years to Forecast")
 years = st.slider("", P_START, P_END)
 days_total = years * 365
 
