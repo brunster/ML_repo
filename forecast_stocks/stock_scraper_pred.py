@@ -28,8 +28,17 @@ def plot_historic():
     st.plotly_chart(fig)
 
 st.title("Stock Prediction Web App S&P500")
+
 tickers = pd.read_html("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")[0].Symbol.to_list()
-ticker_select = st.selectbox("Select ", tickers)
+sec = pd.read_html("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")[0].Security.to_list()
+
+sec_tickers = []
+for t in range(len(tickers)):
+    sec_tick = " - ".join([tickers[t], sec[t]])
+    sec_tickers.append(sec_tick)
+
+
+ticker_select = st.selectbox("Select ", sec_tickers)
 
 load_state = st.text("Downloading Stock Data...")
 data = load_data(ticker_select)
