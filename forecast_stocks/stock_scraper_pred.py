@@ -108,12 +108,10 @@ future = model.make_future_dataframe(periods = days_total)
 y_pred = model.predict(future)
 
 #plotting forecasted results
-#providing the first and final 30 day
+#providing the final 60 day
 #predictions and weights available to view
 st.subheader("Closing Forecast")
 fig = plot_plotly(model, y_pred)
 st.plotly_chart(fig)
-st.subheader("First 30 Day Forecast")
-st.write(y_pred.head(30))
-st.subheader("Last 30 Day Forecast")
+st.subheader("Last 60 Day Forecast")
 st.write(y_pred.tail(30))
