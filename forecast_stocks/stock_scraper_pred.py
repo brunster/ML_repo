@@ -9,7 +9,7 @@ from fbprophet import Prophet
 from fbprophet.plot import plot_plotly
 
 
-START_DATE = "2015-01-01"
+START_DATE = "2000-01-01"
 CURRENT_DATE = date.today().strftime("%Y-%m-%d")
 
 def load_data(ticker):
