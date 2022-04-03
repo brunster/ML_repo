@@ -56,7 +56,7 @@ def menu_choices(option):
     return sec_tickers[i]
 
 #setting page title
-st.title("Stock Prediction Web App S&P500")
+st.title("S&P 500 Stock Prediction App")
 
 #scraping wikipedia for stock tickers and securities
 tickers = pd.read_html("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")[0].Symbol.to_list()
