@@ -12,7 +12,6 @@ from fbprophet.plot import plot_plotly
 START_DATE = "2015-01-01"
 CURRENT_DATE = date.today().strftime("%Y-%m-%d")
 
-
 def load_data(ticker):
     data = yf.download(ticker,
                    START_DATE, CURRENT_DATE,
@@ -20,6 +19,9 @@ def load_data(ticker):
     data.reset_index(inplace = True)
     data.dropna(axis = 1, inplace = True)
     return data
+
+def format_func(option):
+    return tickers
 
 def plot_historic():
     fig = pgo.Figure()
@@ -34,11 +36,11 @@ sec = pd.read_html("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")[
 
 sec_tickers = []
 for t in range(len(tickers)):
-    sec_tick = " - ".join([tickers[t], sec[t]])
+    sec_tick = " - ".join([sec[t], tickers[t]])
     sec_tickers.append(sec_tick)
 
 
-ticker_select = st.selectbox("Select ", sec_tickers)
+ticker_select = st.selectbox("Select ", options = sec_tickers, format_func = format_func)
 
 load_state = st.text("Downloading Stock Data...")
 data = load_data(ticker_select)
