@@ -4,8 +4,8 @@
 # Author: Bryan Bruno
 #
 # allows users to select companies on the S&P500
-# and predict their stock value using FB Prophet
-# all data retrival and predictions are performed live
+# and forecast their stock value using FB Prophet
+# all data retrival and forecasts are performed live
 ######
 
 #import libraries
@@ -56,7 +56,7 @@ def menu_choices(option):
     return sec_tickers[i]
 
 #setting page title
-st.title("S&P 500 Stock Prediction App")
+st.title("S&P 500 Stock Forecast App")
 
 #scraping wikipedia for stock tickers and securities
 tickers = pd.read_html("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")[0].Symbol.to_list()
@@ -85,7 +85,7 @@ st.subheader("Last 7 Days Trading Positions")
 st.write(data.tail(7))
 
 st.markdown("""
-#### This App forecasts the selected stock value using Prophet. The default number of years to predict is 1. You can choose up to 5 using the slider!
+#### This App forecasts the selected stock value using Prophet. The default number of years to forecast is 1. You can choose up to 5 using the slider!
 """)
 
 #user may select the number of years they'd like to forecast
@@ -99,21 +99,21 @@ train = data[["Date", "Close"]]
 train = train.rename(columns = {"Date" : "ds", "Close" : "y"})
 
 #requiring weekly and annual seasonality
-#predictions are on close - daily excluded
+#forecasts are on close - daily excluded
 model = Prophet(daily_seasonality = False,
                 weekly_seasonality = True,
                 yearly_seasonality = True)
 
 #training model
 model.fit(train)
-#creating prediction dataframe
+#creating forecast dataframe
 future = model.make_future_dataframe(periods = days_total)
 #forecasting
 y_pred = model.predict(future)
 
 #plotting forecasted results
 #providing the final 60 day
-#predictions and weights available to view
+#forecast and weights available to view
 st.subheader("Closing Forecast")
 fig = plot_plotly(model, y_pred)
 st.plotly_chart(fig)
