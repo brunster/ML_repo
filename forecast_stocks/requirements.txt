@@ -1,0 +1,5 @@
+### Requirements ###
+streamlit
+yfinance
+fbprophet
+plotly
