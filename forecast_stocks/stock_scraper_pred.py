@@ -20,9 +20,6 @@ def load_data(ticker):
     data.dropna(axis = 1, inplace = True)
     return data
 
-def format_func(option):
-    return tickers
-
 def plot_historic():
     fig = pgo.Figure()
     fig.add_trace(pgo.Scatter(x = data["Date"], y = data["Close"]))
@@ -39,8 +36,8 @@ for t in range(len(tickers)):
     sec_tick = " - ".join([sec[t], tickers[t]])
     sec_tickers.append(sec_tick)
 
-
-ticker_select = st.selectbox("Select ", options = sec_tickers, format_func = format_func)
+choices = dict(zip(sec, tickers))
+ticker_select = st.selectbox("Select ", options = choices, format_func = lambda x: f'list(choices.keys())[x]')
 
 load_state = st.text("Downloading Stock Data...")
 data = load_data(ticker_select)
