@@ -37,7 +37,7 @@ for t in range(len(tickers)):
     sec_tickers.append(sec_tick)
 
 choices = dict(zip(sec, tickers))
-ticker_select = st.selectbox("Select ", options = sec_tickers, format_func = lambda x: tickers[x])
+ticker_select = st.selectbox("Select ", tickers)
 
 load_state = st.text("Downloading Stock Data...")
 data = load_data(ticker_select)
