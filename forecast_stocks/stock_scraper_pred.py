@@ -85,8 +85,8 @@ st.subheader("Last 7 Days Trading Positions")
 st.write(data.tail(7))
 
 st.markdown("""
-This App forecasts the selected stock value using Prophet.
-The default number of years to predict is 1. You can choose up to 5 using the slider!
+### This App forecasts the selected stock value using Prophet.
+### The default number of years to predict is 1. You can choose up to 5 using the slider!
 """)
 
 #user may select the number of years they'd like to forecast
