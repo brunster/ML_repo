@@ -1,9 +1,15 @@
 ### Requirements ###
-Cython
-numpy
-pandas
+yfinance==0.1.72
+streamlit==1.10.0
 pystan==2.19.1.1
-yfinance
-streamlit
-plotly
-fbprophet
+fbprophet==0.7.1
+plotly==5.9.0
+
+#Cython
+#numpy
+#pandas
+#pystan==2.19.1.1
+#yfinance
+#streamlit
+#plotly
+#fbprophet
