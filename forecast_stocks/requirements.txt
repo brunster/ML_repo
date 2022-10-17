@@ -1,9 +1,9 @@
 ### Requirements ###
-Cython
+--prefer-binary
+cython
 numpy
 pandas
-pystan==2.19.1.1
-yfinance
-streamlit
+matplotlib
 plotly
-fbprophet
+prophet>=1.1
+streamlit
