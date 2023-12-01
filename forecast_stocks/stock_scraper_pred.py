@@ -123,5 +123,5 @@ st.markdown("""
 """)
 fig = plot_plotly(model, y_pred)
 st.plotly_chart(fig)
-st.subheader("Last 60 Day Forecast")
+st.subheader("Last 30 Day Forecast")
 st.write(y_pred.tail(30))
