@@ -20,8 +20,7 @@ from prophet.plot import plot_plotly
 
 
 #declaring date and period parameters
-#START_DATE = "2016-01-01"
-START_DATE = date.today().replace(month = 1, day = 1, year = -4).strftime("%Y-%m-%d")
+START_DATE = "2018-01-01"
 CURRENT_DATE = date.today().strftime("%Y-%m-%d")
 P_START = 1
 P_END = 5
