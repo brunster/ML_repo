@@ -95,9 +95,13 @@ years = st.slider("", P_START, P_END)
 days_total = years * 365
 
 #creating a train set with current data selected
-#prophet requires the 'ds' and 'y' labels for forecasting
 train = data[["Date", "Close"]]
-train = train.rename(columns = {"Date" : "ds", "Close" : "y"})
+train["Date"] = pd.to_datetime(train["Date"], errors="coerce")  # Ensure Date is datetime
+train["Close"] = pd.to_numeric(train["Close"], errors="coerce")  # Ensure Close is numeric
+train = train.dropna(subset=["Date", "Close"])
+
+#prophet requires the 'ds' and 'y' labels for forecasting
+train = train.rename(columns={"Date": "ds", "Close": "y"})
 
 #requiring weekly and annual seasonality
 #forecasts are on close - daily excluded
@@ -106,7 +110,12 @@ model = Prophet(daily_seasonality = False,
                 yearly_seasonality = True)
 
 #training model
-model.fit(train)
+try:
+    model.fit(train)
+except Exception as e:
+    st.error(f"Model fitting failed: {str(e)}")
+    raise
+
 #creating forecast dataframe
 future = model.make_future_dataframe(periods = days_total)
 #forecasting
